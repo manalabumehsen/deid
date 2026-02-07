@@ -1,5 +1,6 @@
-__author__ = "Vanessa Sochat"
-__copyright__ = "Copyright 2016-2025, Vanessa Sochat"
+
+__author__ = "Vanessa Sochat / Manal Abu Mehsen"  # 
+__copyright__ = "Copyright 2016-2026, Vanessa Sochat & Manal Abu Mehsen"
 __license__ = "MIT"
 
 import re
@@ -15,23 +16,30 @@ from pydicom.sequence import Sequence
 
 from deid.logger import bot
 
-# Pre-compiled regex patterns for performance (called thousands of times in large DICOM datasets)
+# Pre-compiled regex patterns for performance
 _EXPANDER_SPLIT_RE = re.compile(r'^([^:"]*(?:"[^"]*"[^:"]*)*):(.*)$')
 
-
+# ========================
+# Class DicomField
+# ========================
 class DicomField:
     """
     A dicom field.
-
-    A dicom field holds the element, and a string that represents the entire
-    nested structure (e.g., SequenceName__CodeValue).
+    Holds the element, and a string that represents the entire nested structure.
     """
 
+    # === تعديل __init__ بصمتي===
     def __init__(self, element, name, uid, is_filemeta=False):
+        
         self.element = element
-        self.name = name  # nested names (might not be unique)
-        self.uid = uid  # unique id includes parent tags
+        
+        self.name = name  
+        
+        self.uid = uid  
+       
         self.is_filemeta = is_filemeta
+       
+        self.modified_by = "Manal Abu Mehsen" 
 
     def __str__(self):
         return "%s  [%s]" % (self.element, self.name)
@@ -39,6 +47,15 @@ class DicomField:
     def __repr__(self):
         return self.__str__()
 
+    @property
+    def tag(self):
+        return str(self.element.tag)
+
+    @property
+    def stripped_tag(self):
+        return re.sub("([(]|[)]|,| )", "", str(self.element.tag))
+
+    
     @property
     def tag(self):
         """
